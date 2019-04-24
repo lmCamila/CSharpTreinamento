@@ -8,6 +8,12 @@ namespace Planner.Entity
 {
     class User
     {
+        public User(string name, string email)
+        {
+            Name = name;
+            Email = email;
+        }
+
         public User(long id, string name, string email)
         {
             Id = id;
