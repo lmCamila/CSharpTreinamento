@@ -8,15 +8,7 @@ namespace Planner.Entity
 {
     class Plan
     {
-        public Plan(long id, string name, User sponsor, TypePlan type, DateTime start, DateTime end)
-        {
-            Id = id;
-            Name = name;
-            Sponsor = sponsor;
-            Type = type;
-            Start = start;
-            End = end;
-        }
+        
 
         public long Id { get; set; }
         public string Name { get; set; }

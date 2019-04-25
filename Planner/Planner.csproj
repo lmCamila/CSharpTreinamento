@@ -46,11 +46,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConnectionDB.cs" />
+    <Compile Include="Business\PlanBusiness.cs" />
+    <Compile Include="Business\TypePlanBusiness.cs" />
+    <Compile Include="Business\UserBusiness.cs" />
+    <Compile Include="DAO\DataAccess.cs" />
+    <Compile Include="DAO\PlanDAO.cs" />
+    <Compile Include="DAO\TypePlanDAO.cs" />
+    <Compile Include="DAO\UserDAO.cs" />
     <Compile Include="Entity\Plan.cs" />
     <Compile Include="Entity\TypePlan.cs" />
     <Compile Include="Entity\User.cs" />
-    <Compile Include="GenericDataBase.cs" />
     <Compile Include="Planner.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,5 +93,6 @@
       <DependentUpon>NewUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
