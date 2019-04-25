@@ -9,6 +9,7 @@ namespace Planner
 {
     class Program
     {
+        static Planner planner = new Planner();
         static void Main(string[] args)
         {
             Menu();
@@ -43,7 +44,7 @@ namespace Planner
                     break;
                 case 1 when opMenu == 2:
                     //cadastrar tipo
-                    
+                    planner.CreateTypePlan();
                     break;
                 case 1 when opMenu == 3:
                     //cadastrar user
@@ -51,6 +52,7 @@ namespace Planner
                     break;
                 //listar
                 case 2:
+                    planner.Read(opMenu);
                     break;
                 //excluir
                 case 3:

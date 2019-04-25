@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="App1.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="View\Menu.resx">

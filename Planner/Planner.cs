@@ -1,4 +1,5 @@
-﻿using Planner.Entity;
+﻿using Planner.Business;
+using Planner.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,14 @@ namespace Planner
 {
     class Planner
     {
+        TypePlanBusiness typeBusiness = new TypePlanBusiness();
         internal void CreateUser()
         {
             Console.WriteLine("Nome:");
             var name = Console.ReadLine();
             Console.WriteLine("Email");
             var email = Console.ReadLine();
-            //inserir no banco pegar retorno e colocar em um novo usuario
-            //User user = new User(1, name, email);
+            
         }
         internal void CreatePlan()
         {
@@ -41,6 +42,7 @@ namespace Planner
             var name = Console.ReadLine();
             Console.WriteLine("Descrição:");
             var description = Console.ReadLine();
+            typeBusiness.Create(name, description);
         }
         internal void AlterPlan()
         {
@@ -100,6 +102,16 @@ namespace Planner
         internal void Read(int optEntity)
         {
             //mostrar lista
+            switch (optEntity)
+            {
+                case 1:
+                    break;
+                case 2:
+                    typeBusiness.ReadAll();
+                    break;
+                default:
+                    break;
+            }
         }
 
     }

@@ -58,22 +58,22 @@ namespace Planner.DAO
             dt.AddParam("@ID",System.Data.SqlDbType.Int,id);
             return (dt.ExecuteUpdate(SQL) > 0);
         }
-        public Plan GetById(int id)
-        {
-            //name,id_sponsor,id_type_plan,description,cost,start_date,end_date
-            dt.ClearParams();
-            string SQL = @"SELECT * FROM plans WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, id);
-            DataTable dataTable = dt.ExecuteQuery(SQL);
-            Plan p = new Plan();
-            p.Id = Convert.ToInt32(dataTable.Rows[0]["id"].ToString());
-            p.Name = dataTable.Rows[0]["name"].ToString();
-            //pegar typo e usuario antes 
+        //public Plan GetById(int id)
+        //{
+        //    //name,id_sponsor,id_type_plan,description,cost,start_date,end_date
+        //    dt.ClearParams();
+        //    string SQL = @"SELECT * FROM plans WHERE id = @ID";
+        //    dt.AddParam("@ID", System.Data.SqlDbType.Int, id);
+        //    DataTable dataTable = dt.ExecuteQuery(SQL);
+        //    Plan p = new Plan();
+        //    p.Id = Convert.ToInt32(dataTable.Rows[0]["id"].ToString());
+        //    p.Name = dataTable.Rows[0]["name"].ToString();
+        //    //pegar typo e usuario antes 
 
-        }
-        public List<Plan> GetAll()
-        {
+        //}
+        //public List<Plan> GetAll()
+        //{
 
-        }
+        //}
     }
 }
