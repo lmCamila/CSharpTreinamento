@@ -25,15 +25,31 @@ namespace Planner.DAO
             return (dt.ExecuteUpdate(SQL) > 0);
         }
 
-        public bool Update(TypePlan type)
+        public bool Update(Dictionary<string, string> typeDictionary, string att)
         {
             dt.ClearParams();
-            string SQL = @"UPDATE  type_plans
-                           SET name = @NAME, description = @DESCRIPTION
+            string set = null;
+            if ("desc".Equals(att))
+            {
+                set = "description = @DESCRIPTION";
+                dt.AddParam("@DESCRIPTION", System.Data.SqlDbType.VarChar, typeDictionary["desc"]);
+            }                
+            else if ("name".Equals(att))
+            {
+                set = "name = @NAME";
+                dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, typeDictionary["name"]);
+            }
+            else
+            {
+                set = "name = @NAME, description = @DESCRIPTION";
+                dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, typeDictionary["name"]);
+                dt.AddParam("@DESCRIPTION", System.Data.SqlDbType.VarChar, typeDictionary["desc"]);
+            }
+            string SQL = $@"UPDATE  type_plans 
+                           SET {set} 
                            WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, type.Id);
-            dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, type.Name);
-            dt.AddParam("@DESCRIPTION", System.Data.SqlDbType.VarChar, type.Description);
+            dt.AddParam("@ID", System.Data.SqlDbType.Int, Convert.ToInt32(typeDictionary["id"]));
+           
             return (dt.ExecuteUpdate(SQL) > 0);
         }
         public bool Delete(int id)

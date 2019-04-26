@@ -11,7 +11,7 @@ namespace Planner.Business
     class TypePlanBusiness
     {
         TypePlanDAO dao = new TypePlanDAO();
-        public void Create(string name , string description)
+        public bool Create(string name , string description)
         {
             if(String.IsNullOrEmpty(name))
             {
@@ -20,35 +20,41 @@ namespace Planner.Business
             TypePlan type = new TypePlan();
             type.Name = name;
             type.Description = description;
-            dao.Insert(type);
+            var result = dao.Insert(type);
+            return result;
         }
 
-        public void Update(TypePlan type, string name, string description)
+        public bool Update(Dictionary<string, string> originalValues, Dictionary<string, string> updatedValues)
         {
-            if (!String.IsNullOrEmpty(name))
+            Dictionary<string, string> values = updatedValues
+                                                .Where(entry => originalValues[entry.Key] != entry.Value)
+                                                .ToDictionary(entry => entry.Key, entry => entry.Value);
+
+            string attr = null;
+            //update sob demanda aqui
+            foreach (var item in values)
             {
-                if (!type.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) ||
-                    !type.Description.Equals(description, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    type.Name = name;
-                    type.Description = description;
-                    dao.Update(type);
-                }
+                attr += item.Key;
             }
+
+            return dao.Update(updatedValues, attr);
+
         }
-        public void delete(int id)
+        public bool Delete(int id)
         {
-             
-
+            var result = dao.Delete(id);
+            return result;
         }
 
-        public void ReadAll()
+        public List<TypePlan> Read()
         {
             List<TypePlan> t = dao.getAll();
-            foreach (var type in t)
-            {
-                Console.WriteLine(type.ToString());
-            }
+            return t;
+        }
+
+        public TypePlan GetById(int id)
+        {
+            return dao.GetForId(id);
         }
         //usar dictionary para verificar se o id existe no delete
         //usar dictionary para buscar um tipo caso a lista ja esteja carregada

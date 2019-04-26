@@ -76,7 +76,7 @@ namespace Planner.DAO
             dt.ClearParams();
             string SQL = @"SELECT * FROM users";
             DataTable dtResult = dt.ExecuteQuery(SQL);
-            var list = dtResult.DataSet.Tables[0].AsEnumerable()
+            var list = dtResult.AsEnumerable()
                 .Select(dataRow => new User
                 {
                     Id = dataRow.Field<int>("id"),

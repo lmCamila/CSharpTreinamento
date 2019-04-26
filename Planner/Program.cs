@@ -1,4 +1,5 @@
 ﻿using Planner.Entity;
+using Planner.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Planner
 {
     class Program
     {
-        static Planner planner = new Planner();
+        static TypePlanView typeView = new TypePlanView();
         static void Main(string[] args)
         {
             Menu();
@@ -35,38 +36,122 @@ namespace Planner
             Console.WriteLine("4- Alterar");
             Console.WriteLine("5- Buscar");
             var opt = int.Parse(Console.ReadLine());
+            Console.Clear();
             switch (opt)
             {
-                //cadastrar
-                case 1 when opMenu == 1:
-                    //cadastrar plano
-                    
+                case 1:
+                    Create(opMenu);
+                    Continue();
                     break;
-                case 1 when opMenu == 2:
-                    //cadastrar tipo
-                    planner.CreateTypePlan();
-                    break;
-                case 1 when opMenu == 3:
-                    //cadastrar user
-                    
-                    break;
-                //listar
                 case 2:
-                    planner.Read(opMenu);
+                    Read(opMenu);
+                    Continue();
                     break;
-                //excluir
                 case 3:
+                    Delete(opMenu);
+                    Continue();
                     break;
-                //alterar
                 case 4:
+                    Alter(opMenu);
+                    Continue();
                     break;
-                //buscar
+                case 5:
+                    //Buscar
+                    break;
                 default:
                     break;
             }
         }
-        
+        static void Read(int optEntity)
+        {
+            switch (optEntity)
+            {
+                case 1:
+                    Console.WriteLine("Lista de Planos");
+                    break;
+                case 2:
+                    Console.WriteLine("Lista de Tipos de Plano");
+                    typeView.Read();
+                    break;
+                case 3:
+                    Console.WriteLine("Lista de Usuários");
+                    break;
+                default:
+                    break;
+            }
+        }
 
+        static void Delete(int optEntity)
+        {
+            Console.WriteLine("Insira o id do registro que deseja deletar:");
+            var id = Convert.ToInt32(Console.ReadLine());
+            switch (optEntity)
+            {
+                case 1:
+                    
+                    break;
+                case 2:
+                    typeView.Delete(id);
+                    break;
+                case 3:
+                    
+                    break;
+                default:
+                    break;
+            }
+        }
+        static void Create(int opMenu)
+        {
+            switch (opMenu)
+            {
+                case 1:
+                    break;
+                   
+                case 2:
+                    typeView.Create();
+                    break;
+                case 3:
+                    break;
+                default:
+                    break;
+            }
+        }
+        static void Alter(int opMenu)
+        {
+            switch (opMenu)
+            {
+                case 1:
+                    break;
+                case 2:
+                    Console.WriteLine("Insira o id do tipo:");
+                    var id = Convert.ToInt32(Console.ReadLine());
+                    typeView.Alter(id);
+                    break;
+                case 3:
+                    break;
+                default:
+                    break;
+            }
+        }
+        static void Search(int optEntity)
+        {
+            Console.WriteLine("Insira o id ou nome do registro que deseja buscar:");
+            var idOrName = Console.ReadLine();
+        }
 
+        static void Continue()
+        {
+            Console.WriteLine("Deseja voltar para o menu ? 1-sim 0-não");
+            var op = Convert.ToInt32(Console.ReadLine());
+            switch (op)
+            {
+                case 1:
+                    Console.Clear();
+                    Menu();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
