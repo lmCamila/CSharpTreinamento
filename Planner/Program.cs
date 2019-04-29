@@ -1,16 +1,13 @@
-﻿using Planner.Entity;
-using Planner.View;
+﻿using Planner.View;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Planner
 {
     class Program
     {
         static TypePlanView typeView = new TypePlanView();
+        static UserView userView = new UserView();
+        static PlanView planView = new PlanView();
         static void Main(string[] args)
         {
             Menu();
@@ -75,6 +72,7 @@ namespace Planner
                     break;
                 case 3:
                     Console.WriteLine("Lista de Usuários");
+                    userView.Read();
                     break;
                 default:
                     break;
@@ -94,7 +92,7 @@ namespace Planner
                     typeView.Delete(id);
                     break;
                 case 3:
-                    
+                    userView.Delete(id);
                     break;
                 default:
                     break;
@@ -105,29 +103,35 @@ namespace Planner
             switch (opMenu)
             {
                 case 1:
+                    planView.Create();
                     break;
-                   
                 case 2:
                     typeView.Create();
                     break;
                 case 3:
+                    userView.Create();
                     break;
                 default:
                     break;
             }
         }
         static void Alter(int opMenu)
-        {
+        { 
+            int id;
             switch (opMenu)
             {
+               
                 case 1:
                     break;
                 case 2:
                     Console.WriteLine("Insira o id do tipo:");
-                    var id = Convert.ToInt32(Console.ReadLine());
+                    id = Convert.ToInt32(Console.ReadLine());
                     typeView.Alter(id);
                     break;
                 case 3:
+                    Console.WriteLine("Insira o id do usuário:");
+                    id = Convert.ToInt32(Console.ReadLine());
+                    userView.Alter(id);
                     break;
                 default:
                     break;

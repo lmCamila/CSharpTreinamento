@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Planner.Entity
 {
@@ -20,9 +17,18 @@ namespace Planner.Entity
 
         public override string ToString()
         {
+            string interested = null;
+            foreach(var item in Interested)
+            {
+                interested += $"{item.Id} - {item.Name}\n";
+            }
             return $"Id:{Id}\nNome:{Name}\n" +
                 $"Responsável:{Sponsor.Name}\n" +
-                $"Data Inicial:{Start.ToString("dd/MM/yyyy")}\nData Final:{End.ToString("dd/MM/yyyy")}";
+                $"Tipo:{Type.Name}" +
+                $"Custos:{Cost}" +
+                $"Data Inicial:{Start.ToString("dd/MM/yyyy")}\n" +
+                $"Data Final:{End.ToString("dd/MM/yyyy")}" +
+                $"Pessoas Interressadas:\n {interested}";
         }
 
     }

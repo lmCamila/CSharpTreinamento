@@ -1,102 +1,126 @@
-﻿using Planner.Entity;
+﻿using Dapper;
+using Planner.Entity;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data.SqlClient;
 
 namespace Planner.DAO
 {
-    class TypePlanDAO
+    class TypePlanDAO : IDataAccess
     {
-        DataAccess dt;
-        public TypePlanDAO()
-        {
-            dt = new DataAccess();
-        }
+        
         public bool Insert(TypePlan type)
         {
-            dt.ClearParams();
-            string SQL = @"INSERT INTO type_plans(name,description)
-                            VALUES(@NAME, @DESCRIPTION)";
-            dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, type.Name);
-            dt.AddParam("@DESCRIPTION", System.Data.SqlDbType.VarChar, type.Description);
-            return (dt.ExecuteUpdate(SQL) > 0);
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                int result = db.Execute(@"INSERT INTO type_plans(name,description)
+                            VALUES(@NAME, @DESCRIPTION)",type);
+                return (result > 0);
+            }
+            
         }
 
         public bool Update(Dictionary<string, string> typeDictionary, string att)
         {
-            dt.ClearParams();
-            string set = null;
-            if ("desc".Equals(att))
+            using(IDbConnection db = new SqlConnection(connectionString))
             {
-                set = "description = @DESCRIPTION";
-                dt.AddParam("@DESCRIPTION", System.Data.SqlDbType.VarChar, typeDictionary["desc"]);
-            }                
-            else if ("name".Equals(att))
-            {
-                set = "name = @NAME";
-                dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, typeDictionary["name"]);
+                int result;
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                if ("desc".Equals(att))
+                {
+                    string SQL = @"UPDATE  type_plans 
+                           SET description = @Description 
+                           WHERE id = @Id";
+                    result = db.Execute(SQL, new { Id = Convert.ToInt32(typeDictionary["id"]),
+                                                   Description = typeDictionary["desc"] });
+                }
+                else if ("name".Equals(att))
+                {
+                    string SQL = @"UPDATE  type_plans 
+                           SET name = @Name 
+                           WHERE id = @Id";
+                    result = db.Execute(SQL, new
+                    {
+                        Id = Convert.ToInt32(typeDictionary["id"]),
+                        Name = typeDictionary["name"]
+                    });
+                }
+                else
+                {
+                    string SQL = @"UPDATE  type_plans 
+                           SET name = @Name, description = @Description
+                           WHERE id = @Id";
+                    result = db.Execute(SQL, new
+                    {
+                        Id = Convert.ToInt32(typeDictionary["id"]),
+                        Name = typeDictionary["name"],
+                        Description = typeDictionary["desc"]
+                    });
+
+                }
+                return (result > 0);
             }
-            else
-            {
-                set = "name = @NAME, description = @DESCRIPTION";
-                dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, typeDictionary["name"]);
-                dt.AddParam("@DESCRIPTION", System.Data.SqlDbType.VarChar, typeDictionary["desc"]);
-            }
-            string SQL = $@"UPDATE  type_plans 
-                           SET {set} 
-                           WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, Convert.ToInt32(typeDictionary["id"]));
-           
-            return (dt.ExecuteUpdate(SQL) > 0);
         }
         public bool Delete(int id)
         {
-            dt.ClearParams();
-            string SQL = @"DELETE FROM type_plans WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, id);
-            return (dt.ExecuteUpdate(SQL) > 0);
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                int result = db.Execute("DELETE FROM type_plans WHERE id = @Id", new { Id = id }, commandType: CommandType.Text);
+                return (result > 0);
+            }
         }
         public TypePlan GetForId(int id)
         {
-            dt.ClearParams();
-            string SQL = @"SELECT * FROM type_plans WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, id);
-            DataTable dtResult = dt.ExecuteQuery(SQL);
             TypePlan type = new TypePlan();
-            type.Id = Convert.ToInt32(dtResult.Rows[0]["id"].ToString());
-            type.Name = dtResult.Rows[0]["name"].ToString();
-            type.Description = dtResult.Rows[0]["description"].ToString();
-            return type;
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                type = db.QueryFirst<TypePlan>("SELECT * FROM type_plans WHERE id = @Id", new { Id = id });
+            }
+                return type;
         }
 
         public TypePlan GetForName(string name)
         {
-            dt.ClearParams();
-            string SQL = @"SELECT * FROM type_plans WHERE name LIKE '%@NAME%'";
-            dt.AddParam("@NAME", System.Data.SqlDbType.Int, name);
-            DataTable dtResult = dt.ExecuteQuery(SQL);
             TypePlan type = new TypePlan();
-            type.Id = Convert.ToInt32(dtResult.Rows[0]["id"].ToString());
-            type.Name = dtResult.Rows[0]["name"].ToString();
-            type.Description = dtResult.Rows[0]["description"].ToString();
-            return type;
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                type = db.QueryFirst<TypePlan>("SELECT * FROM type_plans WHERE name LIKE '%@Name%'", 
+                                                new { Name = name });
+                return type;
+            }
         }
 
         public List<TypePlan> getAll()
         {
-            dt.ClearParams();
-            string SQL = @"SELECT * FROM type_plans";
-            DataTable dtResult = dt.ExecuteQuery(SQL);
-            var list = dtResult.AsEnumerable()
-                .Select(dataRow => new TypePlan {
-                    Id = dataRow.Field<int>("id"),
-                    Name = dataRow.Field<string>("name"),
-                    Description = dataRow.Field<string>("description") })
-                .ToList();
-            return list;
+            using(IDbConnection db = new SqlConnection(connectionString))
+            {
+                if(db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                IEnumerable<TypePlan> types = db.Query<TypePlan>("SELECT * FROM type_plans");
+                return (List<TypePlan>)types;
+            }
         }
     }
 }

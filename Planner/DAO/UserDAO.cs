@@ -1,105 +1,109 @@
-﻿using Planner.Entity;
-using System;
+﻿using Dapper;
+using Planner.Entity;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data.SqlClient;
 
 namespace Planner.DAO
 {
-    class UserDAO
+    class UserDAO : IDataAccess
     {
-        DataAccess dt;
-        public UserDAO()
-        {
-            dt = new DataAccess();
-        }
         public bool Insert(User user)
         {
-            dt.ClearParams();
-            string SQL = @"INSERT INTO users (name, email)
-                           VALUES(@NAME, @EMAIL)";
-            dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, user.Name);
-            dt.AddParam("@EMAIL", System.Data.SqlDbType.VarChar, user.Email);
-            return (dt.ExecuteUpdate(SQL) > 0);
+            using (IDbConnection db = new SqlConnection(connectionString)) 
+            {
+                if(db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                int result = db.Execute(@"INSERT INTO users (name, email)
+                                            VALUES(@Name, @Email)", user);
+                return (result > 0);
+            }
         }
 
         public bool Update(Dictionary<string, string> userDictionary, string attr)
         {
-            dt.ClearParams();
-            string set = null;
-            if ("name".Equals(attr))
+            
+            using (IDbConnection db = new SqlConnection(connectionString))
             {
-                set = "name = @NAME";
-                dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, userDictionary["name"]);
+                int result;
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                if ("name".Equals(attr))
+                {
+                    string SQL = @"UPDATE users SET name = @Name WHERE id = @Id";
+                    result = db.Execute(SQL, new { Id = userDictionary["id"], Name = userDictionary["name"] });
+                }
+                else if ("email".Equals(attr))
+                {
+                    string SQL = @"UPDATE users SET email = @Email WHERE id = @Id";
+                    result = db.Execute(SQL, new { Id = userDictionary["id"], Email = userDictionary["email"] });
+                }
+                else
+                {
+                    string SQL = @"UPDATE users SET name = @NAME, email = @EMAIL WHERE id = @Id";
+                    result = db.Execute(SQL, new { Id = userDictionary["email"], Name = userDictionary["name"]
+                                                    ,Email = userDictionary["email"]});
+                }
+                return (result > 0);
             }
-            else if ("email".Equals(attr))
-            {
-                set = "email = @EMAIL";
-                dt.AddParam("@EMAIL", System.Data.SqlDbType.VarChar, userDictionary["email"]);
-            }
-            else
-            {
-                set = "name = @NAME, email = @EMAIL";
-                dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, userDictionary["name"]);
-                dt.AddParam("@EMAIL", System.Data.SqlDbType.VarChar, userDictionary["email"]);
-            }
-            string SQL = $@"UPDATE user 
-                           SET {set}
-                           WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, userDictionary["id"]);
-            return (dt.ExecuteUpdate(SQL) > 0);
         }
 
         public bool Delete(int id)
         {
-            dt.ClearParams();
-            string SQL = @"DELETE FROM users WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, id);
-            return (dt.ExecuteUpdate(SQL) > 0);
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                int result = db.Execute("DELETE FROM users WHERE id = @Id", new { Id = id },
+                                        commandType: CommandType.Text);
+                return (result > 0);
+            }
         }
-
         public User GetById(int id)
         {
-            dt.ClearParams();
-            string SQL = @"SELECT * FROM users WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, id);
-            DataTable dtResult = dt.ExecuteQuery(SQL);
             User user = new User();
-            user.Id = Convert.ToInt32(dtResult.Rows[0]["id"].ToString());
-            user.Name = dtResult.Rows[0]["name"].ToString();
-            user.Email = dtResult.Rows[0]["email"].ToString();
+            using(IDbConnection db = new SqlConnection(connectionString))
+             {
+                  if(db.State == ConnectionState.Closed)
+                  {
+                      db.Open();
+                  }
+                    user = db.QueryFirst<User>("SELECT * FROM users WHERE id = @Id", new { Id = id});
+             }
             return user;
         }
 
         public User GetByName(string name)
         {
-            dt.ClearParams();
-            string SQL = @"SELECT * FROM users WHERE name LIKE '%@NAME%'";
-            dt.AddParam("@NAME", SqlDbType.VarChar, name);
-            DataTable dtResult = dt.ExecuteQuery(SQL);
             User user = new User();
-            user.Id = Convert.ToInt32(dtResult.Rows[0]["id"].ToString());
-            user.Name = dtResult.Rows[0]["name"].ToString();
-            user.Email = dtResult.Rows[0]["email"].ToString();
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                user = db.QueryFirst<User>("SELECT * FROM users WHERE name = LIKE '%@Name%'", new { Name = name });
+            }
             return user;
         }
 
         public List<User> GetAll()
         {
-            dt.ClearParams();
-            string SQL = @"SELECT * FROM users";
-            DataTable dtResult = dt.ExecuteQuery(SQL);
-            var list = dtResult.AsEnumerable()
-                .Select(dataRow => new User
+            using (IDbConnection db = new SqlConnection(connectionString))
+            {
+                if (db.State == ConnectionState.Closed)
                 {
-                    Id = dataRow.Field<int>("id"),
-                    Name = dataRow.Field<string>("name"),
-                    Email = dataRow.Field<string>("email")
-                })
-                .ToList();
-            return list;
+                    db.Open();
+                }
+                IEnumerable<User> users = db.Query<User>("SELECT * FROM users");
+                return (List<User>)users;
+            }
         }
     }
 }

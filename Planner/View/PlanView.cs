@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Planner.View
 {
     class PlanView
     {
-        internal void CreatePlan()
+        internal void Create()
         {
             Console.WriteLine("Nome do plano:");
             var name = Console.ReadLine();
@@ -24,9 +19,11 @@ namespace Planner.View
             var start = Console.ReadLine();
             Console.WriteLine("Data de termino(ex: 04/04/2018):");
             var end = Console.ReadLine();
+            
+           
         }
 
-        internal void AlterPlan()
+        internal void Alter()
         {
             Console.WriteLine("Se não hover necessidade de mudança em algum campo deixe-o vazio...");
             Console.WriteLine("Nome Atual:");
@@ -44,11 +41,11 @@ namespace Planner.View
             Console.WriteLine("Custo atual: R$");
             Console.WriteLine("Custo(R$):");
             var cost = Console.ReadLine();
-            Console.WriteLine("Inicio em:");
             Console.WriteLine("Data de inicio(ex: 04/04/2018):");
+            Console.WriteLine("Inicio em:");
             var start = Console.ReadLine();
-            Console.WriteLine("Termino em:");
             Console.WriteLine("Data de termino(ex: 04/04/2018):");
+            Console.WriteLine("Termino em:");
             var end = Console.ReadLine();
         }
 
