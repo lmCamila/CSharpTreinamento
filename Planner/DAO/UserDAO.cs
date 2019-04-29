@@ -25,15 +25,30 @@ namespace Planner.DAO
             return (dt.ExecuteUpdate(SQL) > 0);
         }
 
-        public bool Update(User user)
+        public bool Update(Dictionary<string, string> userDictionary, string attr)
         {
             dt.ClearParams();
-            string SQL = @"UPDATE user 
-                           SET name = @NAME, email = @EMAIL
+            string set = null;
+            if ("name".Equals(attr))
+            {
+                set = "name = @NAME";
+                dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, userDictionary["name"]);
+            }
+            else if ("email".Equals(attr))
+            {
+                set = "email = @EMAIL";
+                dt.AddParam("@EMAIL", System.Data.SqlDbType.VarChar, userDictionary["email"]);
+            }
+            else
+            {
+                set = "name = @NAME, email = @EMAIL";
+                dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, userDictionary["name"]);
+                dt.AddParam("@EMAIL", System.Data.SqlDbType.VarChar, userDictionary["email"]);
+            }
+            string SQL = $@"UPDATE user 
+                           SET {set}
                            WHERE id = @ID";
-            dt.AddParam("@ID", System.Data.SqlDbType.Int, user.Id);
-            dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, user.Name);
-            dt.AddParam("@EMAIL", System.Data.SqlDbType.VarChar, user.Email);
+            dt.AddParam("@ID", System.Data.SqlDbType.Int, userDictionary["id"]);
             return (dt.ExecuteUpdate(SQL) > 0);
         }
 

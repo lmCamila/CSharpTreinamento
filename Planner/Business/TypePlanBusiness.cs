@@ -20,8 +20,7 @@ namespace Planner.Business
             TypePlan type = new TypePlan();
             type.Name = name;
             type.Description = description;
-            var result = dao.Insert(type);
-            return result;
+            return dao.Insert(type);
         }
 
         public bool Update(Dictionary<string, string> originalValues, Dictionary<string, string> updatedValues)
@@ -31,25 +30,20 @@ namespace Planner.Business
                                                 .ToDictionary(entry => entry.Key, entry => entry.Value);
 
             string attr = null;
-            //update sob demanda aqui
             foreach (var item in values)
-            {
                 attr += item.Key;
-            }
-
+            
             return dao.Update(updatedValues, attr);
 
         }
         public bool Delete(int id)
         {
-            var result = dao.Delete(id);
-            return result;
+            return dao.Delete(id);
         }
 
         public List<TypePlan> Read()
         {
-            List<TypePlan> t = dao.getAll();
-            return t;
+            return dao.getAll();
         }
 
         public TypePlan GetById(int id)
