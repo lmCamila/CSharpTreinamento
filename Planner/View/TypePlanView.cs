@@ -50,7 +50,7 @@ namespace Planner.View
             else
                 throw new Exception("Tipo não pode ser alterado.");
         }
-        internal Dictionary<string, string> generateTypeDictionary(long id, string name, string desc)
+        internal Dictionary<string, string> generateTypeDictionary(int id, string name, string desc)
         {
             Dictionary<string, string> generic = new Dictionary<string, string>();
             generic.Add("id", Convert.ToString(id));

@@ -65,6 +65,7 @@ namespace Planner
             {
                 case 1:
                     Console.WriteLine("Lista de Planos");
+                    planView.Read();
                     break;
                 case 2:
                     Console.WriteLine("Lista de Tipos de Plano");
@@ -86,7 +87,7 @@ namespace Planner
             switch (optEntity)
             {
                 case 1:
-                    
+                    planView.Delete(id);
                     break;
                 case 2:
                     typeView.Delete(id);
@@ -122,6 +123,9 @@ namespace Planner
             {
                
                 case 1:
+                    Console.WriteLine("Insira o id do plano:");
+                    id = Convert.ToInt32(Console.ReadLine());
+                    planView.Alter(id);
                     break;
                 case 2:
                     Console.WriteLine("Insira o id do tipo:");

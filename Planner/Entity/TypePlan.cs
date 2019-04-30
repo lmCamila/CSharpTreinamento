@@ -4,14 +4,14 @@
     {
         public TypePlan() { }
 
-        public TypePlan(long id, string name, string description)
+        public TypePlan(int id, string name, string description)
         {
             Id = id;
             Name = name;
             Description = description;
         }
 
-        public long Id  { get; set; }
+        public int Id  { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 

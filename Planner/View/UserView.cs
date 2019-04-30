@@ -47,7 +47,7 @@ namespace Planner.View
             else
                 throw new Exception($"Não foi possível alterar o usuário {user.Name}");
         }
-        internal Dictionary<string,string> generateUserDictionary(long id, string name, string email)
+        internal Dictionary<string,string> generateUserDictionary(int id, string name, string email)
         {
             Dictionary<string, string> generic = new Dictionary<string, string>();
             generic.Add("id", Convert.ToString(id));

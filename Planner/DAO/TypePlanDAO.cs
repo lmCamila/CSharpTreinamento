@@ -7,12 +7,12 @@ using System.Data.SqlClient;
 
 namespace Planner.DAO
 {
-    class TypePlanDAO : IDataAccess
+    class TypePlanDAO : DataAccess
     {
         
         public bool Insert(TypePlan type)
         {
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
                 {
@@ -27,7 +27,7 @@ namespace Planner.DAO
 
         public bool Update(Dictionary<string, string> typeDictionary, string att)
         {
-            using(IDbConnection db = new SqlConnection(connectionString))
+            using(IDbConnection db = new SqlConnection(ConnectionString))
             {
                 int result;
                 if (db.State == ConnectionState.Closed)
@@ -71,7 +71,7 @@ namespace Planner.DAO
         }
         public bool Delete(int id)
         {
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
                 {
@@ -84,7 +84,7 @@ namespace Planner.DAO
         public TypePlan GetForId(int id)
         {
             TypePlan type = new TypePlan();
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
                 {
@@ -98,7 +98,7 @@ namespace Planner.DAO
         public TypePlan GetForName(string name)
         {
             TypePlan type = new TypePlan();
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
                 {
@@ -112,7 +112,7 @@ namespace Planner.DAO
 
         public List<TypePlan> getAll()
         {
-            using(IDbConnection db = new SqlConnection(connectionString))
+            using(IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if(db.State == ConnectionState.Closed)
                 {

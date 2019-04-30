@@ -6,11 +6,11 @@ using System.Data.SqlClient;
 
 namespace Planner.DAO
 {
-    class UserDAO : IDataAccess
+    class UserDAO : DataAccess
     {
         public bool Insert(User user)
         {
-            using (IDbConnection db = new SqlConnection(connectionString)) 
+            using (IDbConnection db = new SqlConnection(ConnectionString)) 
             {
                 if(db.State == ConnectionState.Closed)
                 {
@@ -25,7 +25,7 @@ namespace Planner.DAO
         public bool Update(Dictionary<string, string> userDictionary, string attr)
         {
             
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 int result;
                 if (db.State == ConnectionState.Closed)
@@ -54,7 +54,7 @@ namespace Planner.DAO
 
         public bool Delete(int id)
         {
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
                 {
@@ -68,7 +68,7 @@ namespace Planner.DAO
         public User GetById(int id)
         {
             User user = new User();
-            using(IDbConnection db = new SqlConnection(connectionString))
+            using(IDbConnection db = new SqlConnection(ConnectionString))
              {
                   if(db.State == ConnectionState.Closed)
                   {
@@ -82,7 +82,7 @@ namespace Planner.DAO
         public User GetByName(string name)
         {
             User user = new User();
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
                 {
@@ -95,7 +95,7 @@ namespace Planner.DAO
 
         public List<User> GetAll()
         {
-            using (IDbConnection db = new SqlConnection(connectionString))
+            using (IDbConnection db = new SqlConnection(ConnectionString))
             {
                 if (db.State == ConnectionState.Closed)
                 {
