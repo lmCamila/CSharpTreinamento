@@ -19,15 +19,15 @@ namespace Planner.View
             var name = Console.ReadLine();
             Console.WriteLine("Descrição:");
             var description = Console.ReadLine();
-            var result = typeBusiness.Create(name, description);
-            Console.Clear();
-            if (result)
+            try
             {
-                 Console.WriteLine("Tipo inserido com sucesso");
-                 TypeList = typeBusiness.Read();
+                typeBusiness.Create(name, description);
+                TypeList = typeBusiness.Read();
+                Console.Clear();
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
-            else
-                throw new Exception("Tipo nao inserido...");
         }
 
         internal void Alter(int id)
@@ -44,13 +44,16 @@ namespace Planner.View
             Dictionary<string, string> updatedValues = GenerateDictionaries.generateTypeDictionary(type.Id,
                                 String.IsNullOrEmpty(name) ? type.Name : name,
                                 String.IsNullOrEmpty(description) ? type.Description : description);
-            if (typeBusiness.Update(originalValues, updatedValues))
+            try
             {
-                Console.WriteLine("Tipo alterado com sucesso.");
+                typeBusiness.Update(originalValues, updatedValues);
                 TypeList = typeBusiness.Read();
             }
-            else
-                throw new Exception("Tipo não pode ser alterado.");
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            
         }
        
         internal void Read()
@@ -65,14 +68,15 @@ namespace Planner.View
 
         internal void Delete(int id)
         {
-            var result = typeBusiness.Delete(id);
-            if (result)
+            try
             {
-                Console.WriteLine("Tipo excluído com sucesso");
+                typeBusiness.Delete(id);
                 TypeList = typeBusiness.Read();
             }
-            else
-                throw new Exception("Tipo nao excluído...");
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
         internal void Search(string Name)
         {

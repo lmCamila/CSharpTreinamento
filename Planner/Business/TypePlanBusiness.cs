@@ -9,7 +9,7 @@ namespace Planner.Business
     class TypePlanBusiness
     {
         TypePlanDAO dao = new TypePlanDAO();
-        public bool Create(string name , string description)
+        public void Create(string name , string description)
         {
             if(String.IsNullOrEmpty(name))
             {
@@ -18,10 +18,16 @@ namespace Planner.Business
             TypePlan type = new TypePlan();
             type.Name = name;
             type.Description = description;
-            return dao.Insert(type);
+            var result = dao.Insert(type);
+            if (result)
+            {
+                Console.WriteLine("Tipo inserido com sucesso");
+            }
+            else
+                throw new Exception("Tipo não pode ser inserido...");
         }
 
-        public bool Update(Dictionary<string, string> originalValues, Dictionary<string, string> updatedValues)
+        public void Update(Dictionary<string, string> originalValues, Dictionary<string, string> updatedValues)
         {
             Dictionary<string, string> values = updatedValues
                                                 .Where(entry => originalValues[entry.Key] != entry.Value)
@@ -31,12 +37,22 @@ namespace Planner.Business
             foreach (var item in values)
                 attr += item.Key;
             
-            return dao.Update(updatedValues, attr);
+            var result =  dao.Update(updatedValues, attr);
 
+            if (result)
+                Console.WriteLine("Tipo alterado com sucesso");
+            else
+                throw new Exception("Tipo não pode ser alterado.");
         }
-        public bool Delete(int id)
+        public void Delete(int id)
         {
-            return dao.Delete(id);
+            var result = dao.Delete(id);
+            if (result)
+            {
+                Console.WriteLine("Tipo excluído com sucesso");
+            }
+            else
+                throw new Exception("Tipo não pode ser excluído...");
         }
 
         public List<TypePlan> Read()
@@ -48,9 +64,6 @@ namespace Planner.Business
         {
             return dao.GetForId(id);
         }
-        //usar dictionary para verificar se o id existe no delete
-        //usar dictionary para buscar um tipo caso a lista ja esteja carregada
-        //muda opcao de busca 
 
     }
 }

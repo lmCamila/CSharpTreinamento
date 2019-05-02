@@ -9,7 +9,7 @@ namespace Planner.Business
     class UserBusiness
     {
         UserDAO dao = new UserDAO();
-        public bool Create(string name, string email)
+        public void Create(string name, string email)
         {
             if(String.IsNullOrEmpty(name) || String.IsNullOrEmpty(email))
                 throw new Exception("Nome ou email não pode ser nulo");
@@ -17,10 +17,14 @@ namespace Planner.Business
             User user = new User();
             user.Name = name;
             user.Email = email;
-            return dao.Insert(user);
+            var result = dao.Insert(user);
+            if (result)
+                Console.WriteLine("Usuário inserido com sucesso");
+            else
+                throw new Exception("usuário não pode ser inserido");
         }
 
-        public bool Update(Dictionary<string, string> originalValues, Dictionary<string, string> updatedValues)
+        public void Update(Dictionary<string, string> originalValues, Dictionary<string, string> updatedValues)
         {
             Dictionary<string, string> values = updatedValues
                                               .Where(entry => originalValues[entry.Key] != entry.Value)
@@ -30,11 +34,19 @@ namespace Planner.Business
             foreach (var item in values)
                 attr += item.Key;
 
-            return dao.Update(updatedValues, attr);
+            var result = dao.Update(updatedValues, attr);
+            if (result)
+                Console.WriteLine("Usuário alterado com sucesso.");
+            else
+                throw new Exception($"Não foi possível alterar o usuário {originalValues["name"]}");
         }
-        public bool Delete(int id)
+        public void Delete(int id)
         {
-            return dao.Delete(id);
+            var result = dao.Delete(id);
+            if (result)
+                Console.WriteLine("Usuário excluído com sucesso.");
+            else
+                throw new Exception("Usuário não excluído...");
         }
         public List<User> Read()
         {

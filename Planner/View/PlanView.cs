@@ -32,24 +32,23 @@ namespace Planner.View
             Console.WriteLine("Data de termino(ex: 04/04/2018):");
             var end = Console.ReadLine();
             double value = String.IsNullOrEmpty(cost) ? 0 : Convert.ToDouble(cost);
-            bool result;
-            if(!String.IsNullOrEmpty(start)|| !String.IsNullOrEmpty(end))
+            try
             {
-                result = planBusiness.Create(name, Convert.ToInt32(idSponsor), Convert.ToInt32(idType), idInterested,
-                    Convert.ToDateTime(start), Convert.ToDateTime(end), description, value) ;
-            }
-            else
-            {
-                result = planBusiness.Create(name, Convert.ToInt32(idSponsor), Convert.ToInt32(idType), idInterested,
-                    description,value);
-            }
-            if (result)
-            {
-                Console.WriteLine("Plano inserido com sucesso");
+                if (!String.IsNullOrEmpty(start) || !String.IsNullOrEmpty(end))
+                {
+                    planBusiness.Create(name, Convert.ToInt32(idSponsor), Convert.ToInt32(idType), idInterested,
+                        Convert.ToDateTime(start), Convert.ToDateTime(end), description, value);
+                }
+                else
+                {
+                    planBusiness.Create(name, Convert.ToInt32(idSponsor), Convert.ToInt32(idType), idInterested,
+                        description, value);
+                }
                 PlanList = planBusiness.Read();
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
-            else
-                throw new Exception("Plano não pode ser inserido");
         }
 
         internal void Alter(int id)
@@ -86,14 +85,15 @@ namespace Planner.View
                 String.IsNullOrEmpty(cost) ? Convert.ToString(p.Cost) : cost, 
                 String.IsNullOrEmpty(start) ? Convert.ToString(p.StartDate) : start, 
                 String.IsNullOrEmpty(end) ? Convert.ToString(p.EndDate) : end);
-            if(planBusiness.Update(originalValues, updatedValues))
+
+            try
             {
-                Console.WriteLine("Plano alterado com sucesso");
+                planBusiness.Update(originalValues, updatedValues);
                 PlanList = planBusiness.Read();
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
-            else
-                throw new Exception("Plano não pode ser alterado.");
-  
         }
         
         internal void Read()
@@ -107,14 +107,15 @@ namespace Planner.View
         }
         internal void Delete(int id)
         {
-            var result = planBusiness.Delete(id);
-            if (result)
+            try
             {
-                Console.WriteLine("Plano deletado com sucesso.");
+                planBusiness.Delete(id);
                 PlanList = planBusiness.Read();
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
-            else
-                throw new Exception("Plano não pode ser excluído");
+            
         }
         internal void Search(string name)
         {

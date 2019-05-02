@@ -18,15 +18,15 @@ namespace Planner.View
             var name = Console.ReadLine();
             Console.WriteLine("Email");
             var email = Console.ReadLine();
-            var result = userBusiness.Create(name, email);
-            Console.Clear();
-            if (result)
+            try
             {
-                Console.WriteLine("Usuário inserido com sucesso");
+                userBusiness.Create(name, email);
                 UsersList = userBusiness.Read();
+                Console.Clear();
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
-            else
-                throw new Exception("usuário não pode ser inserido");
         }
         internal void Alter(int id)
         {
@@ -42,13 +42,14 @@ namespace Planner.View
             Dictionary<string, string> updatedValues = GenerateDictionaries.generateUserDictionary(user.Id,
                                 String.IsNullOrEmpty(name) ? user.Name : name,
                                 String.IsNullOrEmpty(email) ? user.Email : email);
-            if (userBusiness.Update(originalValues, updatedValues))
+            try
             {
-                Console.WriteLine("Usuário alterado com sucesso.");
+                userBusiness.Update(originalValues, updatedValues);
                 UsersList = userBusiness.Read();
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
-            else
-                throw new Exception($"Não foi possível alterar o usuário {user.Name}");
         }
         
         internal void Read()
@@ -60,14 +61,14 @@ namespace Planner.View
         }
         internal void Delete(int id)
         {
-            var result = userBusiness.Delete(id);
-            if (result)
+            try
             {
-                Console.WriteLine("Usuário excluído com sucesso.");
+                userBusiness.Delete(id);
                 UsersList = userBusiness.Read();
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
-            else
-                throw new Exception("Usuário não excluído...");
         }
         internal void Search(string Name)
         {

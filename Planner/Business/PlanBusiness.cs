@@ -9,7 +9,7 @@ namespace Planner.Business
     class PlanBusiness
     {
         PlanDAO dao = new PlanDAO();
-        public bool Create(string name, int idSponsor, int idTypePlan, string idsInterested, string description = null, 
+        public void Create(string name, int idSponsor, int idTypePlan, string idsInterested, string description = null, 
             double cost = 0)
         {
             Plan plan = new Plan();
@@ -22,9 +22,14 @@ namespace Planner.Business
                 plan.Description = description;
             if (cost != 0)
                 plan.Cost = cost;
-            return dao.insert(plan, idsInterested);
+
+            var result = dao.insert(plan, idsInterested);
+            if (result)
+                Console.WriteLine("Plano inserido com sucesso");
+            else
+                throw new Exception("Plano não pode ser inserido");
         }
-        public bool Create(string name, int idSponsor, int idTypePlan, string idsInterested,DateTime start, DateTime end, 
+        public void Create(string name, int idSponsor, int idTypePlan, string idsInterested,DateTime start, DateTime end, 
             string description = null, double cost = 0)
         {
             Plan plan = new Plan();
@@ -39,10 +44,14 @@ namespace Planner.Business
                 plan.Description = description;
             if (cost != 0)
                 plan.Cost = cost;
-            return dao.insert(plan,idsInterested);
+            var result = dao.insert(plan, idsInterested);
+            if (result)
+                Console.WriteLine("Plano inserido com sucesso");
+            else
+                throw new Exception("Plano não pode ser inserido");
         }
 
-        public bool Update(Dictionary<string, string> originalValues, Dictionary<string, string> updatedValues)
+        public void Update(Dictionary<string, string> originalValues, Dictionary<string, string> updatedValues)
         {
             Dictionary<string, string> values = updatedValues
                                                 .Where(entry => originalValues[entry.Key] != entry.Value)
@@ -53,12 +62,19 @@ namespace Planner.Business
                 attr = String.Join(",", item.Key);
            
             var result = values != null ? dao.Update(updatedValues,attr) : false;
-            return result; 
-
+            if (result)
+                Console.WriteLine("Plano alterado com sucesso");
+            else
+                throw new Exception("Plano não pode ser alterado.");
+            
         }
-        public bool Delete(int id)
+        public void Delete(int id)
         {
-            return dao.Delete(id);
+            var result = dao.Delete(id);
+            if (result)
+                Console.WriteLine("Plano deletado com sucesso.");
+            else
+                throw new Exception("Plano não pode ser excluído");
         }
 
         public List<Plan> Read()
