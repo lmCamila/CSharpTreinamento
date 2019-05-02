@@ -33,8 +33,8 @@ namespace Planner.Business
             plan.Type.Id = idTypePlan;
             plan.Sponsor = new User();
             plan.Sponsor.Id = idSponsor;
-            plan.Start = start;
-            plan.End = end;
+            plan.StartDate = start;
+            plan.EndDate = end;
             if (description != null)
                 plan.Description = description;
             if (cost != 0)
@@ -50,8 +50,9 @@ namespace Planner.Business
 
             string attr = null;
             foreach (var item in values)
-                attr += item.Key;
-            var result = values != null ? dao.Update(updatedValues) : false;
+                attr = String.Join(",", item.Key);
+           
+            var result = values != null ? dao.Update(updatedValues,attr) : false;
             return result; 
 
         }

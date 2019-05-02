@@ -1,5 +1,6 @@
 ﻿using Planner.Business;
 using Planner.Entity;
+using Planner.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Planner.View
     {
         PlanBusiness planBusiness = new PlanBusiness();
         public static List<Plan> PlanList { get; set; }
+        public static Dictionary<string, Plan> PlansDictionary { get; set; }
+        public static Dictionary<string, Plan> PlansSponsorDictionary { get; set; }
         internal void Create()
         {
             Console.WriteLine("Nome do plano:");
@@ -52,59 +55,47 @@ namespace Planner.View
         internal void Alter(int id)
         {
             Plan p = planBusiness.GetById(id);
-            Dictionary<string, string> originalValues = generatePlanDictionary(p.Id,p.Name,p.Sponsor.Id,p.Type.Id,
-                string.Join(",",p.Interested.Select(plan => plan.Id)),p.Description,p.Cost, p.Start.ToString(), p.End.ToString());
+            var interestedPeople = p.Interested != null ? string.Join(",", p.Interested.Select(plan => plan.Id)) : "";
+            Dictionary<string, string> originalValues = GenerateDictionaries.generatePlanDictionary(p.Id, p.Name, p.Sponsor.Id, 
+            p.Type.Id,interestedPeople, p.Description, p.Cost, Convert.ToString(p.StartDate), Convert.ToString(p.EndDate));
             Console.WriteLine("Se não hover necessidade de mudança em algum campo deixe-o vazio...");
-            Console.WriteLine("Nome Atual:");
+            Console.WriteLine("Informações atuais : ");
+            Console.WriteLine(p.ToString());
             Console.WriteLine("Novo nome:");
             var name = Console.ReadLine();
-            Console.WriteLine("Id do Responsavel Atual:");
             Console.WriteLine("Id do novo Responsavel:");
             var idSponsor = Console.ReadLine();
-            Console.WriteLine("Id do Tipo Atual:");
             Console.WriteLine("Id do novo Tipo:");
             var idType = Console.ReadLine();
-            Console.WriteLine("Id das pessoas interessadas");
             Console.WriteLine("Id das pessoas interessadas(separado por virgula):");
             var idInterested = Console.ReadLine();
-            Console.WriteLine("Descrição do plano:");
             Console.WriteLine("Nova descrição:");
             var description = Console.ReadLine();
-            Console.WriteLine("Custo atual: R$");
             Console.WriteLine("Custo(R$):");
             var cost = Console.ReadLine();
             Console.WriteLine("Data de inicio(ex: 04/04/2018):");
-            Console.WriteLine("Inicio em:");
             var start = Console.ReadLine();
             Console.WriteLine("Data de termino(ex: 04/04/2018):");
-            Console.WriteLine("Termino em:");
-            var end = Console.ReadLine();
-            Dictionary<string, string> updatedValues = generatePlanDictionary(p.Id, name, Convert.ToInt64(idSponsor),
-                Convert.ToInt64(idType), idInterested, description, Convert.ToDouble(cost), start, end);
+            var end = Console.ReadLine() ;
+            Dictionary<string, string> updatedValues = GenerateDictionaries.generatePlanDictionary(p.Id,
+                String.IsNullOrEmpty(name) ? p.Name : name, 
+                String.IsNullOrEmpty(idSponsor) ? Convert.ToString(p.Sponsor.Id): idSponsor,
+                String.IsNullOrEmpty(idType) ? Convert.ToString(p.Type.Id) :idType, 
+                String.IsNullOrEmpty(idInterested) ? string.Join(",", p.Interested.Select(plan => plan.Id)) : idInterested,
+                String.IsNullOrEmpty(description) ? p.Description : description,
+                String.IsNullOrEmpty(cost) ? Convert.ToString(p.Cost) : cost, 
+                String.IsNullOrEmpty(start) ? Convert.ToString(p.StartDate) : start, 
+                String.IsNullOrEmpty(end) ? Convert.ToString(p.EndDate) : end);
             if(planBusiness.Update(originalValues, updatedValues))
             {
                 Console.WriteLine("Plano alterado com sucesso");
+                PlanList = planBusiness.Read();
             }
             else
                 throw new Exception("Plano não pode ser alterado.");
-            
-
+  
         }
-        internal Dictionary<string, string> generatePlanDictionary(int id, string name, long idSponsor, long idType,
-            string idsInterested, string description, double costs, string startDate, string endDate)
-        {
-            Dictionary<string, string> generic = new Dictionary<string, string>();
-            generic.Add("id", Convert.ToString(id));
-            generic.Add("name", name);
-            generic.Add("idSponsor", Convert.ToString(idSponsor));
-            generic.Add("idType", Convert.ToString(idType));
-            generic.Add("idsInterested",idsInterested);
-            generic.Add("description",description);
-            generic.Add("costs", Convert.ToString(costs));
-            generic.Add("start",startDate);
-            generic.Add("end",endDate);
-            return generic;
-        }
+        
         internal void Read()
         {
             if (PlanList == null)
@@ -124,6 +115,26 @@ namespace Planner.View
             }
             else
                 throw new Exception("Plano não pode ser excluído");
+        }
+        internal void Search(string name)
+        {
+            if (PlanList == null)
+                PlanList = planBusiness.Read();
+            if(PlansDictionary == null)
+                PlansDictionary = PlanList.ToDictionary(p => p.Name, p => p);
+            var results = PlansDictionary.Where(plan => plan.Key.Contains(name)).Select(plan => plan.Value);
+            foreach (var item in results)
+                Console.WriteLine(item.ToString());
+        }
+        internal void SearchBySponsor(string name)
+        {
+            if (PlanList == null)
+                PlanList = planBusiness.Read();
+            if (PlansDictionary == null)
+                PlansSponsorDictionary = PlanList.ToDictionary(p => p.Sponsor.Name, p => p);
+            var results = PlansSponsorDictionary.Where(plan => plan.Key.Contains(name)).Select(plan => plan.Value);
+            foreach (var item in results)
+                Console.WriteLine(item.ToString());
         }
     }
 }

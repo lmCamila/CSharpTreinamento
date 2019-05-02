@@ -1,7 +1,9 @@
 ﻿using Planner.Business;
 using Planner.Entity;
+using Planner.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Planner.View
 {
@@ -9,6 +11,7 @@ namespace Planner.View
     {
         UserBusiness userBusiness = new UserBusiness();
         public static List<User> UsersList { get; set; }
+        public static Dictionary<string, User> UsersDictionary { get; set; }
         internal void Create()
         {
             Console.WriteLine("Nome:");
@@ -28,7 +31,7 @@ namespace Planner.View
         internal void Alter(int id)
         {
             User user = userBusiness.GetById(id);
-            Dictionary<string, string> originalValues = generateUserDictionary(user.Id, user.Name, user.Email);
+            Dictionary<string, string> originalValues = GenerateDictionaries.generateUserDictionary(user.Id, user.Name, user.Email);
             Console.WriteLine("Se não hover necessidade de alteração de algum campo deixe-o vazio...");
             Console.WriteLine($"Nome atual:{user.Name}");
             Console.WriteLine("Novo nome:");
@@ -36,7 +39,7 @@ namespace Planner.View
             Console.WriteLine($"Email atual:{user.Email}");
             Console.WriteLine("Novo email:");
             var email = Console.ReadLine();
-            Dictionary<string, string> updatedValues = generateUserDictionary(user.Id,
+            Dictionary<string, string> updatedValues = GenerateDictionaries.generateUserDictionary(user.Id,
                                 String.IsNullOrEmpty(name) ? user.Name : name,
                                 String.IsNullOrEmpty(email) ? user.Email : email);
             if (userBusiness.Update(originalValues, updatedValues))
@@ -47,14 +50,7 @@ namespace Planner.View
             else
                 throw new Exception($"Não foi possível alterar o usuário {user.Name}");
         }
-        internal Dictionary<string,string> generateUserDictionary(int id, string name, string email)
-        {
-            Dictionary<string, string> generic = new Dictionary<string, string>();
-            generic.Add("id", Convert.ToString(id));
-            generic.Add("name", name);
-            generic.Add("email", email);
-            return generic;
-        }
+        
         internal void Read()
         {
             if (UsersList == null)
@@ -72,6 +68,16 @@ namespace Planner.View
             }
             else
                 throw new Exception("Usuário não excluído...");
+        }
+        internal void Search(string Name)
+        {
+            if (UsersList == null)
+                UsersList = userBusiness.Read();
+            if (UsersDictionary == null)
+                UsersDictionary = UsersList.ToDictionary(u => u.Name, u => u);
+            var results = UsersDictionary.Where(user => user.Key.Contains(Name)).Select(user => user.Value);
+            foreach (var item in results)
+                Console.WriteLine(item.ToString());
         }
     }
 }

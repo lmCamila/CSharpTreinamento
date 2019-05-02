@@ -9,8 +9,8 @@ namespace Planner.Entity
         public string Name { get; set; }
         public User Sponsor { get; set; }
         public TypePlan Type { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public string Description { get; set; }
         public double Cost { get; set; }
         public List<User> Interested { get; set; }
@@ -27,11 +27,12 @@ namespace Planner.Entity
             }
             return $"Id:{Id}\nNome:{Name}\n" +
                 $"Responsável:{Sponsor.Name}\n" +
-                $"Tipo:{Type.Name}" +
-                $"Custos:{Cost}" +
-                $"Data Inicial:{Start.ToString("dd/MM/yyyy")}\n" +
-                $"Data Final:{End.ToString("dd/MM/yyyy")}" +
-                $"Pessoas Interressadas:\n {interested}";
+                $"Tipo:{Type.Name}\n" +
+                $"Descrição:{Description}\n" +
+                $"Custos:{Cost}\n" +
+                $"Data Inicial:{StartDate.ToString("dd/MM/yyyy")}\n" +
+                $"Data Final:{EndDate.ToString("dd/MM/yyyy")}\n" +
+                $"Pessoas Interressadas:\n{interested}";
         }
 
     }

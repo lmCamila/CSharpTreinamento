@@ -32,6 +32,7 @@ namespace Planner
             Console.WriteLine("3- Excluir");
             Console.WriteLine("4- Alterar");
             Console.WriteLine("5- Buscar");
+            Console.WriteLine("0- Voltar ao menu anterior");
             var opt = int.Parse(Console.ReadLine());
             Console.Clear();
             switch (opt)
@@ -53,7 +54,12 @@ namespace Planner
                     Continue();
                     break;
                 case 5:
-                    //Buscar
+                    Search(opMenu);
+                    Continue();
+                    break;
+                case 0:
+                    Console.Clear();
+                    Menu();
                     break;
                 default:
                     break;
@@ -143,10 +149,53 @@ namespace Planner
         }
         static void Search(int optEntity)
         {
-            Console.WriteLine("Insira o id ou nome do registro que deseja buscar:");
-            var idOrName = Console.ReadLine();
+            string name;
+            switch (optEntity)
+            {
+                case 1:
+                    SearchInPlans();
+                    Continue();
+                    break;
+                case 2:
+                    Console.WriteLine("Digite o nome do tipo que deseja buscar:");
+                    name = Console.ReadLine();
+                    typeView.Search(name);
+                    Continue();
+                    break;
+                case 3:
+                    Console.WriteLine("Digite o nome do usuário que deseja buscar:");
+                    name = Console.ReadLine();
+                    userView.Search(name);
+                    Continue();
+                    break;
+                default:
+                    break;
+            }
         }
-
+        static void SearchInPlans()
+        {
+            Console.WriteLine("Deseja buscar por:");
+            Console.WriteLine("1- Nome do plano");
+            Console.WriteLine("2- Nome do usuário responsável pelo plano");
+            Console.WriteLine("0- Voltar para o menu inicial:");
+            string name;
+            var op = Convert.ToInt32(Console.ReadLine());
+            switch (op)
+            {
+                case 1:
+                    Console.WriteLine("Digite o nome do plano que deseja buscar:");
+                    name = Console.ReadLine();
+                    planView.Search(name);
+                    break;
+                case 2:
+                    Console.WriteLine("Digite o nome do usuário em que deseja buscar os planos:");
+                    name = Console.ReadLine();
+                    planView.SearchBySponsor(name);
+                    break;
+                default:
+                    break;
+            }
+        }
         static void Continue()
         {
             Console.WriteLine("Deseja voltar para o menu ? 1-sim 0-não");

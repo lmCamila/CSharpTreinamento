@@ -1,4 +1,5 @@
 ﻿using Planner.Entity;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using Dapper;
@@ -26,21 +27,33 @@ namespace Planner.DAO
                     InterestedUser = idsInterested,
                     Description = plan.Description,
                     Costs = plan.Cost,
-                    StartDate = plan.Start,
-                    EndDate = plan.End
+                    StartDate = plan.StartDate,
+                    EndDate = plan.EndDate
                 }, commandType: CommandType.StoredProcedure);
 
 
                 return (results > 0);
             }
         }
-        public bool Update(Dictionary<string, string> plan)
+        public bool Update(Dictionary<string, string> plan,string attr)
         {
             using(IDbConnection db = new SqlConnection(ConnectionString))
             {
+                DateTime ? start = null;
+                DateTime  ? end = null;
                 if (db.State == ConnectionState.Closed)
                 {
                     db.Open();
+                }
+                if(DateTime.Compare(Convert.ToDateTime(plan["start"]), DateTime.MinValue) > 0 &&
+                    DateTime.Compare(Convert.ToDateTime(plan["start"]), DateTime.MaxValue) < 0)
+                {
+                   start = Convert.ToDateTime(plan["start"]);
+                }
+                if(DateTime.Compare(Convert.ToDateTime(plan["end"]), DateTime.MaxValue) < 0 
+                    && DateTime.Compare(Convert.ToDateTime(plan["end"]), DateTime.MinValue) > 0)
+                {
+                    end = Convert.ToDateTime(plan["end"]);
                 }
                 string SQL = @"UPDATE plans SET
                                   name = @Name,
@@ -51,43 +64,37 @@ namespace Planner.DAO
                                   start_date = @StartDate,
                                   end_date = @EndDate
                             WHERE id = @Id";
+
                 int result = db.Execute(SQL, new { Name = plan["name"], IdSponsor = plan["idSponsor"], IdTypePlan = plan["idType"],
-                    Description = plan["description"], Cost=plan["cost"], StartDate=plan["start"], EndDate = plan["end"],
-                    Id = plan["id"]
+                    Description = plan["description"], Cost=plan["costs"], StartDate = start,
+                    EndDate = end,Id = plan["id"]
                 });
-                if (plan["idsInterested"] != null)
+                if (attr.Contains("idsInterested"))
                 {
-                    result += db.Execute("DELETE FROM plan WHERE idPlan = @Id", new { Id = plan["id"] },
-                                        commandType: CommandType.Text);
-                    var ids = plan["idsInterested"].Split(',');
-                    foreach (var item in ids)
-                    {
-                        result += db.Execute(@"INSERT INTO plans_interested_users (id_plan,id_user)
-                                              VALUES(@IdPlan, @IdUser)", new { IdPlan = plan["id"], IdUser = item });
-                    }
+                    result += AlterInterested(plan["idsInterested"], Convert.ToInt32(plan["id"]));
                     
                 }
                 return (result > 0);
             }
-           
-            //dt.ClearParams();
-            //string SQL = @"UPDATE plans SET
-            //                      name = @NAME,
-            //                      id_sponsor = @ID_SPONSOR,
-            //                      id_type_plan = @ID_TYPE_PLAN,
-            //                      description = @DESCRIPTION,
-            //                      cost = @COST,
-            //                      start_date = @START_DATE,
-            //                      end_date = @END_DATE
-            //                WHERE id = @ID";
-            //dt.AddParam("@ID", System.Data.SqlDbType.Int, plan.Id);
-            //dt.AddParam("@NAME", System.Data.SqlDbType.VarChar, plan.Name);
-            //dt.AddParam("@ID_SPONSOR", System.Data.SqlDbType.Int, plan.Sponsor.Id);
-            //dt.AddParam("@ID_TYPE_PLAN", System.Data.SqlDbType.Int, plan.Type.Id);
-            //dt.AddParam("@DESCRIPTION", System.Data.SqlDbType.VarChar, plan.Description);
-            //dt.AddParam("@START_DATE", System.Data.SqlDbType.DateTime, plan.Start);
-            //dt.AddParam("@END_DATE", System.Data.SqlDbType.DateTime, plan.End);
-            //return (dt.ExecuteUpdate(SQL) > 0);
+        }
+        private int AlterInterested(string idsInterested , int id)
+        {
+            using (IDbConnection db = new SqlConnection(ConnectionString))
+            {
+                if (db.State == ConnectionState.Closed)
+                {
+                    db.Open();
+                }
+                var result = db.Execute("DELETE FROM plans_interested_users WHERE id_plan = @Id", new { Id = id },
+                                       commandType: CommandType.Text);
+                var ids = idsInterested.Split(',');
+                foreach (var item in ids)
+                {
+                    result += db.Execute(@"INSERT INTO plans_interested_users (id_plan,id_user)
+                                              VALUES(@IdPlan, @IdUser)", new { IdPlan = id, IdUser = item });
+                }
+                return result;
+            }
         }
 
         public bool Delete(int id)
@@ -102,22 +109,19 @@ namespace Planner.DAO
                                         commandType: CommandType.Text);
                 return (result > 0);
             }
-            //dt.ClearParams();
-            //string SQL = @"DELETE FROM plan WHERE id = @ID";
-            //dt.AddParam("@ID",System.Data.SqlDbType.Int,id);
-            //return (dt.ExecuteUpdate(SQL) > 0);
         }
 
         public Plan GetById(int id)
         {
             using(IDbConnection db = new SqlConnection(ConnectionString))
             {
-                if(db.State == ConnectionState.Closed)
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                if (db.State == ConnectionState.Closed)
                 {
                     db.Close();
                 }
 
-                var query = db.Query<Plan, User, TypePlan, Plan>(@"SELECT p.* , tp.*, u.*
+                var query = db.Query<Plan, User, TypePlan, Plan>(@"SELECT p.* , u.*, tp.*
                         FROM plans p inner join type_plans tp on p.id_type_plan = tp.id
                         inner join users u on p.id_sponsor = u.id
                         where p.id = @Id"
@@ -128,31 +132,26 @@ namespace Planner.DAO
                     return p;
                 }, new { Id = id }, splitOn: "id,id,id"
                 ).AsList();
-               
+                var queryInterested = db.Query<User>(@"SELECT u.*
+                                                    FROM users u INNER JOIN plans_interested_users piu ON u.id = piu.id_user
+                                                    WHERE id_plan = @Id ",new { Id = id });
+                query[0].Interested = (List<User>)queryInterested;
                 return query[0];
             }
-            //name,id_sponsor,id_type_plan,description,cost,start_date,end_date
-            //dt.ClearParams();
-            //string SQL = @"SELECT * FROM plans WHERE id = @ID";
-            //dt.AddParam("@ID", System.Data.SqlDbType.Int, id);
-            //DataTable dataTable = dt.ExecuteQuery(SQL);
-            //Plan p = new Plan();
-            //p.Id = Convert.ToInt32(dataTable.Rows[0]["id"].ToString());
-            //p.Name = dataTable.Rows[0]["name"].ToString();
-            //pegar typo e usuario antes 
-
+            
         }
 
         public List<Plan> GetAll()
         {
             using (IDbConnection db = new SqlConnection(ConnectionString))
             {
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
                 if (db.State == ConnectionState.Closed)
                 {
                     db.Close();
                 }
 
-                var query = db.Query<Plan, User, TypePlan, Plan>(@"SELECT p.* , tp.*, u.*
+                var query = db.Query<Plan, User, TypePlan, Plan>(@"SELECT p.* , u.*, tp.*
                         FROM plans p inner join type_plans tp on p.id_type_plan = tp.id
                         inner join users u on p.id_sponsor = u.id"
                 , (p, u, tp) =>
@@ -162,6 +161,13 @@ namespace Planner.DAO
                     return p;
                 }, null, splitOn: "id,id,id"
                 ).AsList();
+                foreach (var item in query)
+                {
+                    var queryInterested = db.Query<User>(@"SELECT u.*
+                                                    FROM users u INNER JOIN plans_interested_users piu ON u.id = piu.id_user
+                                                    WHERE id_plan = @Id ", new { Id = item.Id });
+                    item.Interested = (List<User>)queryInterested;
+                }
                 return query;
             }
         }
