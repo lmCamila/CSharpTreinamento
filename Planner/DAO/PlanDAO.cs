@@ -118,7 +118,7 @@ namespace Planner.DAO
                 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
                 if (db.State == ConnectionState.Closed)
                 {
-                    db.Close();
+                    db.Open();
                 }
 
                 var query = db.Query<Plan, User, TypePlan, Plan>(@"SELECT p.* , u.*, tp.*
@@ -148,7 +148,7 @@ namespace Planner.DAO
                 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
                 if (db.State == ConnectionState.Closed)
                 {
-                    db.Close();
+                    db.Open();
                 }
 
                 var query = db.Query<Plan, User, TypePlan, Plan>(@"SELECT p.* , u.*, tp.*
